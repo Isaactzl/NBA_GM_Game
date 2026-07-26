@@ -1,0 +1,802 @@
+[
+  {
+    "id": "jokic_nikola",
+    "name": "Nikola Jokic",
+    "tier": "S",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "S",
+      "playmaking": "S",
+      "iq": "S",
+      "defense": "B",
+      "mentality": "S",
+      "athleticism": "C"
+    }
+  },
+  {
+    "id": "curry_stephen",
+    "name": "Stephen Curry",
+    "tier": "S",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "S",
+      "finishing": "A",
+      "playmaking": "A",
+      "iq": "S",
+      "defense": "C",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "james_lebron",
+    "name": "LeBron James",
+    "tier": "S",
+    "position": "SF",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "S",
+      "playmaking": "S",
+      "iq": "S",
+      "defense": "A",
+      "mentality": "S",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "antetokounmpo_giannis",
+    "name": "Giannis Antetokounmpo",
+    "tier": "S",
+    "position": "PF",
+    "attributes": {
+      "size": "S",
+      "shooting": "C",
+      "finishing": "S",
+      "playmaking": "A",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "S",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "doncic_luka",
+    "name": "Luka Doncic",
+    "tier": "S",
+    "position": "PG",
+    "attributes": {
+      "size": "A",
+      "shooting": "S",
+      "finishing": "S",
+      "playmaking": "S",
+      "iq": "S",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "C"
+    }
+  },
+  {
+    "id": "embiid_joel",
+    "name": "Joel Embiid",
+    "tier": "S",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "S",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "durant_kevin",
+    "name": "Kevin Durant",
+    "tier": "S",
+    "position": "SF",
+    "attributes": {
+      "size": "S",
+      "shooting": "S",
+      "finishing": "S",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "A",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "gilgeous_alexander_shai",
+    "name": "Shai Gilgeous-Alexander",
+    "tier": "S",
+    "position": "SG",
+    "attributes": {
+      "size": "A",
+      "shooting": "A",
+      "finishing": "S",
+      "playmaking": "A",
+      "iq": "S",
+      "defense": "A",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "edwards_anthony",
+    "name": "Anthony Edwards",
+    "tier": "A",
+    "position": "SG",
+    "attributes": {
+      "size": "B",
+      "shooting": "A",
+      "finishing": "S",
+      "playmaking": "B",
+      "iq": "B",
+      "defense": "A",
+      "mentality": "S",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "wembanyama_victor",
+    "name": "Victor Wembanyama",
+    "tier": "A",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "B",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "A",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "tatum_jayson",
+    "name": "Jayson Tatum",
+    "tier": "A",
+    "position": "SF",
+    "attributes": {
+      "size": "A",
+      "shooting": "A",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "A",
+      "mentality": "A",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "booker_devin",
+    "name": "Devin Booker",
+    "tier": "A",
+    "position": "SG",
+    "attributes": {
+      "size": "B",
+      "shooting": "S",
+      "finishing": "A",
+      "playmaking": "A",
+      "iq": "A",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "leonard_kawhi",
+    "name": "Kawhi Leonard",
+    "tier": "A",
+    "position": "SF",
+    "attributes": {
+      "size": "A",
+      "shooting": "A",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "S",
+      "defense": "S",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "davis_anthony",
+    "name": "Anthony Davis",
+    "tier": "A",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "C",
+      "finishing": "S",
+      "playmaking": "C",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "A",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "haliburton_tyrese",
+    "name": "Tyrese Haliburton",
+    "tier": "A",
+    "position": "PG",
+    "attributes": {
+      "size": "B",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "S",
+      "iq": "S",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "brunson_jalen",
+    "name": "Jalen Brunson",
+    "tier": "A",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "A",
+      "finishing": "S",
+      "playmaking": "A",
+      "iq": "S",
+      "defense": "C",
+      "mentality": "S",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "butler_jimmy",
+    "name": "Jimmy Butler",
+    "tier": "A",
+    "position": "SF",
+    "attributes": {
+      "size": "B",
+      "shooting": "B",
+      "finishing": "A",
+      "playmaking": "A",
+      "iq": "S",
+      "defense": "A",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "lillard_damian",
+    "name": "Damian Lillard",
+    "tier": "A",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "S",
+      "finishing": "A",
+      "playmaking": "A",
+      "iq": "A",
+      "defense": "D",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "irving_kyrie",
+    "name": "Kyrie Irving",
+    "tier": "A",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "S",
+      "finishing": "S",
+      "playmaking": "A",
+      "iq": "S",
+      "defense": "C",
+      "mentality": "S",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "george_paul",
+    "name": "Paul George",
+    "tier": "A",
+    "position": "SF",
+    "attributes": {
+      "size": "A",
+      "shooting": "A",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "A",
+      "mentality": "B",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "sabonis_domantas",
+    "name": "Domantas Sabonis",
+    "tier": "A",
+    "position": "C",
+    "attributes": {
+      "size": "A",
+      "shooting": "C",
+      "finishing": "A",
+      "playmaking": "S",
+      "iq": "S",
+      "defense": "B",
+      "mentality": "A",
+      "athleticism": "C"
+    }
+  },
+  {
+    "id": "fox_deaaron",
+    "name": "De'Aaron Fox",
+    "tier": "A",
+    "position": "PG",
+    "attributes": {
+      "size": "C",
+      "shooting": "B",
+      "finishing": "A",
+      "playmaking": "A",
+      "iq": "B",
+      "defense": "B",
+      "mentality": "A",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "adebayo_bam",
+    "name": "Bam Adebayo",
+    "tier": "B",
+    "position": "C",
+    "attributes": {
+      "size": "A",
+      "shooting": "D",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "brown_jaylen",
+    "name": "Jaylen Brown",
+    "tier": "B",
+    "position": "SG",
+    "attributes": {
+      "size": "A",
+      "shooting": "B",
+      "finishing": "A",
+      "playmaking": "C",
+      "iq": "B",
+      "defense": "A",
+      "mentality": "A",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "mitchell_donovan",
+    "name": "Donovan Mitchell",
+    "tier": "B",
+    "position": "SG",
+    "attributes": {
+      "size": "C",
+      "shooting": "A",
+      "finishing": "A",
+      "playmaking": "A",
+      "iq": "B",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "morant_ja",
+    "name": "Ja Morant",
+    "tier": "B",
+    "position": "PG",
+    "attributes": {
+      "size": "C",
+      "shooting": "C",
+      "finishing": "S",
+      "playmaking": "A",
+      "iq": "B",
+      "defense": "D",
+      "mentality": "A",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "williamson_zion",
+    "name": "Zion Williamson",
+    "tier": "B",
+    "position": "PF",
+    "attributes": {
+      "size": "A",
+      "shooting": "D",
+      "finishing": "S",
+      "playmaking": "B",
+      "iq": "C",
+      "defense": "C",
+      "mentality": "B",
+      "athleticism": "S"
+    }
+  },
+  {
+    "id": "siakam_pascal",
+    "name": "Pascal Siakam",
+    "tier": "B",
+    "position": "PF",
+    "attributes": {
+      "size": "A",
+      "shooting": "B",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "B",
+      "mentality": "A",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "gobert_rudy",
+    "name": "Rudy Gobert",
+    "tier": "B",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "D",
+      "finishing": "B",
+      "playmaking": "D",
+      "iq": "B",
+      "defense": "S",
+      "mentality": "B",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "derozan_demar",
+    "name": "DeMar DeRozan",
+    "tier": "B",
+    "position": "SF",
+    "attributes": {
+      "size": "B",
+      "shooting": "C",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "D",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "young_trae",
+    "name": "Trae Young",
+    "tier": "B",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "S",
+      "iq": "A",
+      "defense": "D",
+      "mentality": "B",
+      "athleticism": "C"
+    }
+  },
+  {
+    "id": "garland_darius",
+    "name": "Darius Garland",
+    "tier": "B",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "A",
+      "iq": "B",
+      "defense": "D",
+      "mentality": "B",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "bridges_mikal",
+    "name": "Mikal Bridges",
+    "tier": "B",
+    "position": "SF",
+    "attributes": {
+      "size": "A",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "C",
+      "iq": "A",
+      "defense": "A",
+      "mentality": "A",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "holiday_jrue",
+    "name": "Jrue Holiday",
+    "tier": "B",
+    "position": "PG",
+    "attributes": {
+      "size": "B",
+      "shooting": "B",
+      "finishing": "B",
+      "playmaking": "B",
+      "iq": "S",
+      "defense": "S",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "markkanen_lauri",
+    "name": "Lauri Markkanen",
+    "tier": "B",
+    "position": "PF",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "A",
+      "playmaking": "C",
+      "iq": "B",
+      "defense": "C",
+      "mentality": "B",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "banchero_paolo",
+    "name": "Paolo Banchero",
+    "tier": "B",
+    "position": "PF",
+    "attributes": {
+      "size": "S",
+      "shooting": "B",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "B",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "holmgren_chet",
+    "name": "Chet Holmgren",
+    "tier": "B",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "C",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "williams_jalen",
+    "name": "Jalen Williams",
+    "tier": "B",
+    "position": "SF",
+    "attributes": {
+      "size": "B",
+      "shooting": "A",
+      "finishing": "A",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "B",
+      "mentality": "A",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "caruso_alex",
+    "name": "Alex Caruso",
+    "tier": "C",
+    "position": "PG",
+    "attributes": {
+      "size": "C",
+      "shooting": "C",
+      "finishing": "C",
+      "playmaking": "B",
+      "iq": "S",
+      "defense": "S",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "white_derrick",
+    "name": "Derrick White",
+    "tier": "C",
+    "position": "SG",
+    "attributes": {
+      "size": "B",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "B",
+      "iq": "S",
+      "defense": "A",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "smart_marcus",
+    "name": "Marcus Smart",
+    "tier": "C",
+    "position": "PG",
+    "attributes": {
+      "size": "C",
+      "shooting": "C",
+      "finishing": "C",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "S",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "hart_josh",
+    "name": "Josh Hart",
+    "tier": "C",
+    "position": "SF",
+    "attributes": {
+      "size": "C",
+      "shooting": "C",
+      "finishing": "B",
+      "playmaking": "C",
+      "iq": "S",
+      "defense": "B",
+      "mentality": "S",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "anonuby_og",
+    "name": "OG Anunoby",
+    "tier": "C",
+    "position": "SF",
+    "attributes": {
+      "size": "A",
+      "shooting": "B",
+      "finishing": "B",
+      "playmaking": "D",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "B",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "lopez_brook",
+    "name": "Brook Lopez",
+    "tier": "C",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "C",
+      "playmaking": "D",
+      "iq": "A",
+      "defense": "S",
+      "mentality": "A",
+      "athleticism": "D"
+    }
+  },
+  {
+    "id": "turner_myles",
+    "name": "Myles Turner",
+    "tier": "C",
+    "position": "C",
+    "attributes": {
+      "size": "S",
+      "shooting": "A",
+      "finishing": "C",
+      "playmaking": "D",
+      "iq": "B",
+      "defense": "S",
+      "mentality": "B",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "powell_norman",
+    "name": "Norman Powell",
+    "tier": "C",
+    "position": "SG",
+    "attributes": {
+      "size": "C",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "D",
+      "iq": "B",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "monk_malik",
+    "name": "Malik Monk",
+    "tier": "C",
+    "position": "SG",
+    "attributes": {
+      "size": "D",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "B",
+      "iq": "C",
+      "defense": "D",
+      "mentality": "B",
+      "athleticism": "A"
+    }
+  },
+  {
+    "id": "reid_naz",
+    "name": "Naz Reid",
+    "tier": "C",
+    "position": "PF",
+    "attributes": {
+      "size": "A",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "C",
+      "iq": "B",
+      "defense": "C",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  },
+  {
+    "id": "reaves_austin",
+    "name": "Austin Reaves",
+    "tier": "C",
+    "position": "SG",
+    "attributes": {
+      "size": "C",
+      "shooting": "A",
+      "finishing": "B",
+      "playmaking": "B",
+      "iq": "A",
+      "defense": "D",
+      "mentality": "A",
+      "athleticism": "C"
+    }
+  },
+  {
+    "id": "pritchard_payton",
+    "name": "Payton Pritchard",
+    "tier": "D",
+    "position": "PG",
+    "attributes": {
+      "size": "D",
+      "shooting": "A",
+      "finishing": "C",
+      "playmaking": "C",
+      "iq": "A",
+      "defense": "D",
+      "mentality": "A",
+      "athleticism": "B"
+    }
+  }
+]
