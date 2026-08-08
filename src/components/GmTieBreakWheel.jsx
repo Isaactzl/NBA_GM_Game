@@ -23,13 +23,21 @@ const buildWheelGradient = (count) => {
   return `conic-gradient(${segments.join(', ')})`;
 };
 
-export function GmTieBreakWheel({ candidates, winnerId, unwantedPlayerName, soundEnabled, soundVolume, onComplete }) {
+export function GmTieBreakWheel({ candidates, unwantedPlayerName, reason, soundEnabled, soundVolume, onComplete }) {
   const controls = useAnimation();
   const [phase, setPhase] = useState('spinning');
+  const [selectedWinnerId] = useState(() => {
+    if (!candidates.length) {
+      return null;
+    }
+
+    const selected = candidates[Math.floor(Math.random() * candidates.length)];
+    return selected?.id ?? null;
+  });
 
   const winnerIndex = useMemo(
-    () => Math.max(0, candidates.findIndex((gm) => gm.id === winnerId)),
-    [candidates, winnerId],
+    () => Math.max(0, candidates.findIndex((gm) => gm.id === selectedWinnerId)),
+    [candidates, selectedWinnerId],
   );
 
   const targetRotation = useMemo(() => {
@@ -84,6 +92,7 @@ export function GmTieBreakWheel({ candidates, winnerId, unwantedPlayerName, soun
   return (
     <div className="gm-wheel-overlay-fullscreen">
       <p className="gm-wheel-title">Wheel of Misfortune</p>
+      <p className="gm-wheel-reason">{reason || 'Tie on roster count: wheel decides who gets the player.'}</p>
 
       <div className="gm-wheel-shell">
         <motion.div

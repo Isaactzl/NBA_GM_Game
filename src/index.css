@@ -806,6 +806,16 @@ button {
   text-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
 }
 
+.gm-wheel-reason {
+  margin: -8px 0 2px;
+  text-align: center;
+  width: min(92vw, 680px);
+  font-size: clamp(0.82rem, 2.2vw, 1rem);
+  font-weight: 700;
+  color: #fde68a;
+  letter-spacing: 0.02em;
+}
+
 .gm-wheel-shell {
   position: relative;
   display: grid;

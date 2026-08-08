@@ -48,7 +48,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
   const [isPlayerWheelSpinning, setIsPlayerWheelSpinning] = useState(false);
   const [isPlayerWheelLanded, setIsPlayerWheelLanded] = useState(false);
   const [wheelDisplayName, setWheelDisplayName] = useState('');
-  const [gmWheelState, setGmWheelState] = useState({ active: false, candidateIds: [], winnerId: null, player: null });
+  const [gmWheelState, setGmWheelState] = useState({ active: false, candidateIds: [], player: null, reason: '' });
   const currentBidRef = useRef(0);
   const highestBidderRef = useRef(null);
   const previousSecondsRef = useRef(AUCTION_SECONDS);
@@ -104,12 +104,13 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
 
       // When multiple GMs are tied on roster count, run the GM-name wheel.
       if (tiedTargets.length > 1) {
-        const selectedWinner = tiedTargets[Math.floor(Math.random() * tiedTargets.length)];
         setGmWheelState({
           active: true,
           candidateIds: tiedTargets.map((gm) => gm.id),
-          winnerId: selectedWinner.id,
           player,
+          reason: noMoneyOpenSlotGms.length > 0
+            ? 'No-bid penalty tie: same roster count in the no-money pool.'
+            : 'No bids and same roster count: the wheel decides the owner.',
         });
         setIsPaused(true);
         return true;
@@ -396,7 +397,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
       setIsPaused(false);
     }
 
-    setGmWheelState({ active: false, candidateIds: [], winnerId: null, player: null });
+    setGmWheelState({ active: false, candidateIds: [], player: null, reason: '' });
   };
 
   const activeFranchisePlacement = franchisePlacement ?? null;
@@ -601,8 +602,8 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
       {gmWheelState.active && (
         <GmTieBreakWheel
           candidates={gms.filter((gm) => gmWheelState.candidateIds.includes(gm.id))}
-          winnerId={gmWheelState.winnerId}
           unwantedPlayerName={gmWheelState.player?.name ?? 'this player'}
+          reason={gmWheelState.reason}
           soundEnabled={soundEnabled}
           soundVolume={soundVolume}
           onComplete={handleGmTieBreakComplete}
