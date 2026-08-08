@@ -83,30 +83,6 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     [openSlotGms],
   );
 
-  const forceRandomOpeningBid = useCallback(() => {
-    const eligibleGms = gms
-      .filter((gm) => gm.budget > 0 && gm.roster.length < MAX_ROSTER_SIZE)
-      .map((gm) => ({
-        ...gm,
-        openSlots: MAX_ROSTER_SIZE - gm.roster.length,
-      }));
-
-    if (eligibleGms.length === 0) {
-      return false;
-    }
-
-    const mostOpen = Math.max(...eligibleGms.map((gm) => gm.openSlots));
-    const priorityGms = eligibleGms.filter((gm) => gm.openSlots === mostOpen);
-    const forcedBidder = priorityGms[Math.floor(Math.random() * priorityGms.length)];
-
-    setCurrentBid(1);
-    setHighestBidderId(forcedBidder.id);
-    currentBidRef.current = 1;
-    highestBidderRef.current = forcedBidder.id;
-    setSecondsLeft(AUCTION_SECONDS);
-    return true;
-  }, [gms, MAX_ROSTER_SIZE]);
-
   const resolveNoBidOutcome = useCallback(
     (player) => {
       if (!player) {
@@ -117,47 +93,44 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
         return false;
       }
 
-      // Punishment path: if any open-slot GM has no money, force the player to that pool.
-      if (noMoneyOpenSlotGms.length > 0) {
-        const prioritized = noMoneyOpenSlotGms.map((gm) => ({
-          ...gm,
-          openSlots: MAX_ROSTER_SIZE - gm.roster.length,
-        }));
-        const mostOpen = Math.max(...prioritized.map((gm) => gm.openSlots));
-        const tiedTargets = prioritized.filter((gm) => gm.openSlots === mostOpen);
+      // If any open-slot GM has no money, that punishment pool has priority.
+      const candidatePool = noMoneyOpenSlotGms.length > 0 ? noMoneyOpenSlotGms : openSlotGms;
+      const prioritized = candidatePool.map((gm) => ({
+        ...gm,
+        openSlots: MAX_ROSTER_SIZE - gm.roster.length,
+      }));
+      const mostOpen = Math.max(...prioritized.map((gm) => gm.openSlots));
+      const tiedTargets = prioritized.filter((gm) => gm.openSlots === mostOpen);
 
-        if (tiedTargets.length > 1) {
-          const selectedWinner = tiedTargets[Math.floor(Math.random() * tiedTargets.length)];
-          setGmWheelState({
-            active: true,
-            candidateIds: tiedTargets.map((gm) => gm.id),
-            winnerId: selectedWinner.id,
-            player,
-          });
-          setIsPaused(true);
-          return true;
-        }
-
-        const forcedTarget = tiedTargets[Math.floor(Math.random() * tiedTargets.length)];
-        const winner = buyPlayer(forcedTarget.id, player.id, 0);
-
-        if (winner && gameMode === 'frankenstein') {
-          setPendingPlacement({ gmId: forcedTarget.id, player: winner });
-          playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
-        } else if (winner && gameMode === 'the-franchise') {
-          setFranchisePlacement({ gmId: forcedTarget.id, player: winner });
-          setFranchisePosition(null);
-          setIsPaused(true);
-          playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
-        }
-
-        return Boolean(winner);
+      // When multiple GMs are tied on roster count, run the GM-name wheel.
+      if (tiedTargets.length > 1) {
+        const selectedWinner = tiedTargets[Math.floor(Math.random() * tiedTargets.length)];
+        setGmWheelState({
+          active: true,
+          candidateIds: tiedTargets.map((gm) => gm.id),
+          winnerId: selectedWinner.id,
+          player,
+        });
+        setIsPaused(true);
+        return true;
       }
 
-      // Random opener only when every open-slot GM still has money.
-      return forceRandomOpeningBid();
+      const forcedTarget = tiedTargets[0];
+      const winner = buyPlayer(forcedTarget.id, player.id, 0);
+
+      if (winner && gameMode === 'frankenstein') {
+        setPendingPlacement({ gmId: forcedTarget.id, player: winner });
+        playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
+      } else if (winner && gameMode === 'the-franchise') {
+        setFranchisePlacement({ gmId: forcedTarget.id, player: winner });
+        setFranchisePosition(null);
+        setIsPaused(true);
+        playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
+      }
+
+      return Boolean(winner);
     },
-    [openSlotGms, noMoneyOpenSlotGms, MAX_ROSTER_SIZE, buyPlayer, gameMode, forceRandomOpeningBid, soundEnabled, soundVolume],
+    [openSlotGms, noMoneyOpenSlotGms, MAX_ROSTER_SIZE, buyPlayer, gameMode, soundEnabled, soundVolume],
   );
 
   const availablePlayers = useMemo(
