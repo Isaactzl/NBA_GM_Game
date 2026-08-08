@@ -841,6 +841,11 @@ button {
   overflow: hidden;
 }
 
+.gm-wheel-disc.is-landed {
+  animation: wheelLandHit 420ms ease;
+  box-shadow: 0 0 62px rgba(248, 113, 113, 0.5), 0 0 24px rgba(251, 191, 36, 0.28);
+}
+
 .gm-wheel-label {
   position: absolute;
   inset: 0;
@@ -858,6 +863,16 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-shadow: 0 2px 6px rgba(2, 6, 23, 0.75);
+}
+
+.gm-wheel-hold-note {
+  margin: -2px 0 0;
+  font-size: clamp(0.9rem, 2.4vw, 1.1rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fde68a;
+  text-shadow: 0 0 14px rgba(251, 191, 36, 0.42);
 }
 
 .gm-wheel-result {

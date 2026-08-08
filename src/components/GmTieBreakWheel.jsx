@@ -4,6 +4,7 @@ import { playArcadeSound } from '../utils/soundEngine.js';
 
 const BASE_SPINS = 5;
 const SPIN_DURATION_SECONDS = 2.9;
+const LANDING_HOLD_MS = 1300;
 
 const WEDGE_COLORS = ['#f59e0b', '#ef4444', '#22d3ee', '#34d399', '#a78bfa', '#fb7185', '#f97316', '#38bdf8'];
 
@@ -49,6 +50,7 @@ export function GmTieBreakWheel({ candidates, unwantedPlayerName, reason, soundE
 
   useEffect(() => {
     let tickInterval = null;
+    let revealTimer = null;
     let cancelled = false;
 
     const run = async () => {
@@ -71,10 +73,16 @@ export function GmTieBreakWheel({ candidates, unwantedPlayerName, reason, soundE
 
       window.clearInterval(tickInterval);
       playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
-      window.setTimeout(() => {
-        playArcadeSound('revealHit', { enabled: soundEnabled, volume: soundVolume });
-      }, 80);
       setPhase('landed');
+
+      revealTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        playArcadeSound('revealHit', { enabled: soundEnabled, volume: soundVolume });
+        setPhase('revealed');
+      }, LANDING_HOLD_MS);
     };
 
     run();
@@ -83,6 +91,9 @@ export function GmTieBreakWheel({ candidates, unwantedPlayerName, reason, soundE
       cancelled = true;
       if (tickInterval) {
         window.clearInterval(tickInterval);
+      }
+      if (revealTimer) {
+        window.clearTimeout(revealTimer);
       }
     };
   }, [controls, targetRotation, soundEnabled, soundVolume]);
@@ -103,7 +114,7 @@ export function GmTieBreakWheel({ candidates, unwantedPlayerName, reason, soundE
           ▼
         </motion.div>
 
-        <motion.div className="gm-wheel-disc" animate={controls} style={{ background: gradient }}>
+        <motion.div className={`gm-wheel-disc ${phase !== 'spinning' ? 'is-landed' : ''}`} animate={controls} style={{ background: gradient }}>
           {candidates.map((gm, index) => {
             const angle = index * (360 / Math.max(1, candidates.length));
 
@@ -121,6 +132,10 @@ export function GmTieBreakWheel({ candidates, unwantedPlayerName, reason, soundE
       </div>
 
       {phase === 'landed' && winner && (
+        <p className="gm-wheel-hold-note">Locked on {winner.name}...</p>
+      )}
+
+      {phase === 'revealed' && winner && (
         <motion.div
           className="gm-wheel-result"
           initial={{ scale: 0.75, opacity: 0 }}
