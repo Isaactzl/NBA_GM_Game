@@ -5,7 +5,7 @@ import { playArcadeSound } from '../utils/soundEngine.js';
 
 const AUCTION_SECONDS = 15;
 const PLAYER_WHEEL_SPIN_MS = 2500;
-const PLAYER_WHEEL_LAND_HOLD_MS = 300;
+const PLAYER_WHEEL_LAND_HOLD_MS = 1000;
 
 const TIER_GLOW = {
   S: 'rgba(251, 191, 36, 0.16)',
