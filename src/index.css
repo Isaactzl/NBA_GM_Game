@@ -1582,13 +1582,13 @@ p {
 .player-attr-grade-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
+  gap: 8px;
 }
 
 .player-attr-grade-pill {
   display: grid;
-  gap: 2px;
-  padding: 6px;
+  gap: 3px;
+  padding: 8px 6px;
   border-radius: 10px;
   background: rgba(15, 23, 42, 0.76);
   border: 1px solid rgba(148, 163, 184, 0.16);
@@ -1602,14 +1602,14 @@ p {
 }
 
 .player-attr-grade-pill span {
-  font-size: 0.66rem;
+  font-size: 0.74rem;
   color: #94a3b8;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .player-attr-grade-pill strong {
-  font-size: 0.94rem;
+  font-size: 1.12rem;
   font-weight: 900;
   line-height: 1;
 }
@@ -1617,12 +1617,12 @@ p {
 .god-tier-mini-badge {
   justify-self: center;
   margin-top: 1px;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: 999px;
   border: 1px solid rgba(251, 191, 36, 0.45);
   background: rgba(251, 191, 36, 0.12);
   color: #fde68a;
-  font-size: 0.56rem;
+  font-size: 0.62rem;
   font-style: normal;
   font-weight: 800;
   letter-spacing: 0.05em;
