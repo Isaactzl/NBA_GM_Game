@@ -44,6 +44,9 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
   const [franchiseReveal, setFranchiseReveal] = useState(null);
   const [isPlayerWheelSpinning, setIsPlayerWheelSpinning] = useState(false);
   const [wheelDisplayName, setWheelDisplayName] = useState('');
+  const [isGmWheelSpinning, setIsGmWheelSpinning] = useState(false);
+  const [gmWheelState, setGmWheelState] = useState({ active: false, candidateIds: [], winnerId: null, player: null });
+  const [gmWheelDisplayName, setGmWheelDisplayName] = useState('');
   const currentBidRef = useRef(0);
   const highestBidderRef = useRef(null);
   const previousSecondsRef = useRef(AUCTION_SECONDS);
@@ -120,6 +123,20 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
         }));
         const mostOpen = Math.max(...prioritized.map((gm) => gm.openSlots));
         const tiedTargets = prioritized.filter((gm) => gm.openSlots === mostOpen);
+
+        if (tiedTargets.length > 1) {
+          setGmWheelState({
+            active: true,
+            candidateIds: tiedTargets.map((gm) => gm.id),
+            winnerId: null,
+            player,
+          });
+          setIsGmWheelSpinning(true);
+          setIsPaused(true);
+          playArcadeSound('wheelStart', { enabled: soundEnabled, volume: soundVolume });
+          return true;
+        }
+
         const forcedTarget = tiedTargets[Math.floor(Math.random() * tiedTargets.length)];
         const winner = buyPlayer(forcedTarget.id, player.id, 0);
 
@@ -139,7 +156,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
       // Random opener only when every open-slot GM still has money.
       return forceRandomOpeningBid();
     },
-    [openSlotGms, noMoneyOpenSlotGms, MAX_ROSTER_SIZE, buyPlayer, gameMode, forceRandomOpeningBid],
+    [openSlotGms, noMoneyOpenSlotGms, MAX_ROSTER_SIZE, buyPlayer, gameMode, forceRandomOpeningBid, soundEnabled, soundVolume],
   );
 
   const availablePlayers = useMemo(
@@ -169,7 +186,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
   }, [activePlayer?.id, clearAuctionState]);
 
   useEffect(() => {
-    if (!activePlayer || draftComplete || pendingPlacement || franchisePlacement || franchiseReveal) {
+    if (!activePlayer || draftComplete || pendingPlacement || franchisePlacement || franchiseReveal || isGmWheelSpinning) {
       return undefined;
     }
 
@@ -186,23 +203,87 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
       if (tickCount % 2 === 0) {
         playArcadeSound('wheelTick', { enabled: soundEnabled, volume: soundVolume * 0.8 });
       }
-    }, 75);
+    }, 95);
 
     const stopTimer = window.setTimeout(() => {
       window.clearInterval(spinInterval);
       setWheelDisplayName(activePlayer.name);
       setIsPlayerWheelSpinning(false);
       playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
-    }, 1450);
+    }, 2100);
 
     return () => {
       window.clearTimeout(stopTimer);
       window.clearInterval(spinInterval);
     };
-  }, [activePlayer, availablePlayers, draftComplete, pendingPlacement, franchisePlacement, franchiseReveal, soundEnabled, soundVolume]);
+  }, [activePlayer, availablePlayers, draftComplete, pendingPlacement, franchisePlacement, franchiseReveal, isGmWheelSpinning, soundEnabled, soundVolume]);
 
   useEffect(() => {
-    if (!activePlayer || pendingPlacement || isPaused || draftComplete || isPlayerWheelSpinning || franchisePlacement || franchiseReveal) {
+    if (!gmWheelState.active || gmWheelState.winnerId || !gmWheelState.player) {
+      return undefined;
+    }
+
+    const candidateGms = gms.filter((gm) => gmWheelState.candidateIds.includes(gm.id));
+    if (candidateGms.length === 0) {
+      setIsGmWheelSpinning(false);
+      setGmWheelState({ active: false, candidateIds: [], winnerId: null, player: null });
+      setIsPaused(false);
+      return undefined;
+    }
+
+    setGmWheelDisplayName(candidateGms[0].name);
+    let index = 0;
+    let tickCount = 0;
+
+    const spinInterval = window.setInterval(() => {
+      index = (index + 1) % candidateGms.length;
+      setGmWheelDisplayName(candidateGms[index].name);
+      tickCount += 1;
+      if (tickCount % 2 === 0) {
+        playArcadeSound('wheelTick', { enabled: soundEnabled, volume: soundVolume * 0.85 });
+      }
+    }, 120);
+
+    const stopTimer = window.setTimeout(() => {
+      window.clearInterval(spinInterval);
+      const winner = candidateGms[Math.floor(Math.random() * candidateGms.length)];
+      setGmWheelDisplayName(winner.name);
+      setGmWheelState((current) => ({ ...current, winnerId: winner.id }));
+      setIsGmWheelSpinning(false);
+      playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
+    }, 2200);
+
+    return () => {
+      window.clearTimeout(stopTimer);
+      window.clearInterval(spinInterval);
+    };
+  }, [gmWheelState.active, gmWheelState.winnerId, gmWheelState.player, gmWheelState.candidateIds, gms, soundEnabled, soundVolume]);
+
+  useEffect(() => {
+    if (!gmWheelState.active || !gmWheelState.winnerId || !gmWheelState.player) {
+      return;
+    }
+
+    const winner = buyPlayer(gmWheelState.winnerId, gmWheelState.player.id, 0);
+
+    if (winner && gameMode === 'frankenstein') {
+      setPendingPlacement({ gmId: gmWheelState.winnerId, player: winner });
+      playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
+    } else if (winner && gameMode === 'the-franchise') {
+      setFranchisePlacement({ gmId: gmWheelState.winnerId, player: winner });
+      setFranchisePosition(null);
+      setIsPaused(true);
+      playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
+    } else {
+      setIsPaused(false);
+    }
+
+    setGmWheelState({ active: false, candidateIds: [], winnerId: null, player: null });
+    setGmWheelDisplayName('');
+  }, [gmWheelState, buyPlayer, gameMode, soundEnabled, soundVolume]);
+
+  useEffect(() => {
+    if (!activePlayer || pendingPlacement || isPaused || draftComplete || isPlayerWheelSpinning || isGmWheelSpinning || franchisePlacement || franchiseReveal) {
       return undefined;
     }
 
@@ -211,10 +292,10 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [activePlayer, pendingPlacement, isPaused, draftComplete, isPlayerWheelSpinning, franchisePlacement, franchiseReveal]);
+  }, [activePlayer, pendingPlacement, isPaused, draftComplete, isPlayerWheelSpinning, isGmWheelSpinning, franchisePlacement, franchiseReveal]);
 
   useEffect(() => {
-    if (isPaused || draftComplete || isPlayerWheelSpinning || pendingPlacement || franchisePlacement || franchiseReveal) {
+    if (isPaused || draftComplete || isPlayerWheelSpinning || isGmWheelSpinning || pendingPlacement || franchisePlacement || franchiseReveal) {
       previousSecondsRef.current = secondsLeft;
       return;
     }
@@ -227,10 +308,10 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     }
 
     previousSecondsRef.current = secondsLeft;
-  }, [secondsLeft, isPaused, draftComplete, isPlayerWheelSpinning, pendingPlacement, franchisePlacement, franchiseReveal, soundEnabled, soundVolume]);
+  }, [secondsLeft, isPaused, draftComplete, isPlayerWheelSpinning, isGmWheelSpinning, pendingPlacement, franchisePlacement, franchiseReveal, soundEnabled, soundVolume]);
 
   useEffect(() => {
-    if (secondsLeft > 0 || !activePlayer || pendingPlacement || isPaused || draftComplete || isPlayerWheelSpinning || franchisePlacement || franchiseReveal) {
+    if (secondsLeft > 0 || !activePlayer || pendingPlacement || isPaused || draftComplete || isPlayerWheelSpinning || isGmWheelSpinning || franchisePlacement || franchiseReveal) {
       return;
     }
 
@@ -267,6 +348,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     isPaused,
     draftComplete,
     isPlayerWheelSpinning,
+    isGmWheelSpinning,
     franchisePlacement,
     franchiseReveal,
     buyPlayer,
@@ -450,6 +532,8 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                     <p className="auction-hint compact-hint">
                       {isPlayerWheelSpinning
                         ? 'Arcade wheel selecting the next spotlight player...'
+                        : isGmWheelSpinning
+                        ? 'GM tie-break wheel spinning for forced assignment...'
                         : isPaused
                         ? 'Paused — press Resume when everyone is ready to bid.'
                         : 'Scout the player, then hit the market.'}
@@ -475,6 +559,15 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                       <p className="eyebrow">Arcade Player Wheel</p>
                       <strong>{wheelDisplayName || 'Selecting...'}</strong>
                       <span>Landing on next auction target...</span>
+                    </div>
+                  </div>
+                )}
+                {isGmWheelSpinning && (
+                  <div className="player-wheel-overlay gm-wheel-overlay">
+                    <div className="player-wheel-card gm-wheel-card">
+                      <p className="eyebrow">Forced Assignment Tie-Break</p>
+                      <strong>{gmWheelDisplayName || 'Selecting GM...'}</strong>
+                      <span>No bids and tied slots. Wheel deciding who takes this player.</span>
                     </div>
                   </div>
                 )}
@@ -511,6 +604,8 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                     ? 'Draft complete'
                     : isPlayerWheelSpinning
                       ? 'Player wheel spinning'
+                    : isGmWheelSpinning
+                      ? 'GM wheel spinning'
                     : franchiseReveal
                       ? 'Position locked'
                       : franchisePlacement
@@ -521,7 +616,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 </span>
               </div>
 
-              {!isPaused && !isPlayerWheelSpinning && !currentBid && !highestBidderId && !franchisePlacement && (
+              {!isPaused && !isPlayerWheelSpinning && !isGmWheelSpinning && !currentBid && !highestBidderId && !franchisePlacement && (
                 <div className="auction-warning-pill">⚠ No bids yet. Timeout may hand this player away automatically.</div>
               )}
 
@@ -529,7 +624,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 {gms.map((gm) => {
                   const isRosterFull = gm.roster.length >= MAX_ROSTER_SIZE;
                   const isNoMoney = gm.budget <= currentBid;
-                  const isDisabled = draftComplete || pendingPlacement || franchiseReveal || franchisePlacement || isPlayerWheelSpinning || isNoMoney || isRosterFull;
+                  const isDisabled = draftComplete || pendingPlacement || franchiseReveal || franchisePlacement || isPlayerWheelSpinning || isGmWheelSpinning || isNoMoney || isRosterFull;
                   const isLeading = gm.id === highestBidderId;
                   const statusLabel = isLeading
                     ? 'Leading'
@@ -561,7 +656,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 })}
               </div>
 
-              <button className="auction-pass-btn" onClick={skipAuction} disabled={draftComplete || franchiseReveal || franchisePlacement || isPlayerWheelSpinning}>
+              <button className="auction-pass-btn" onClick={skipAuction} disabled={draftComplete || franchiseReveal || franchisePlacement || isPlayerWheelSpinning || isGmWheelSpinning}>
                 Pass (Skip Player)
               </button>
             </div>
@@ -617,7 +712,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
             onDragEnd={() => setDraggedPlayerName(null)}
           >
             <strong>{pendingPlacement.player.name}</strong>
-            <span>{pendingPlacement.player.position} • Tier {pendingPlacement.player.tier}</span>
+            <span>{showPlayerStats ? `${pendingPlacement.player.position} • Tier ${pendingPlacement.player.tier}` : pendingPlacement.player.position}</span>
             <span>{draggedPlayerName ? 'Drop into a category' : 'Drag into a category'}</span>
           </div>
 
