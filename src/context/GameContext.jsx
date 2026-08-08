@@ -281,6 +281,13 @@ export function GameProvider({ children }) {
       return false;
     }
 
+    const positionTakenByTeammate = targetGM.roster.some(
+      (player) => player.id !== playerId && player.assignedPosition === position,
+    );
+    if (positionTakenByTeammate) {
+      return false;
+    }
+
     if (targetPlayer.assignedPosition && !allowFranchisePositionShifts) {
       return false;
     }
@@ -324,9 +331,21 @@ export function GameProvider({ children }) {
 
     const currentPosition = targetPlayer.assignedPosition ?? targetPlayer.position ?? FRANCHISE_POSITIONS[0];
     const currentIndex = FRANCHISE_POSITIONS.indexOf(currentPosition);
-    const nextPosition = FRANCHISE_POSITIONS[(currentIndex + 1) % FRANCHISE_POSITIONS.length];
+    const occupiedPositions = new Set(
+      targetGM.roster
+        .filter((player) => player.id !== playerId && player.assignedPosition)
+        .map((player) => player.assignedPosition),
+    );
 
-    return setFranchisePlayerPosition(gmId, playerId, nextPosition);
+    for (let step = 1; step <= FRANCHISE_POSITIONS.length; step += 1) {
+      const candidate = FRANCHISE_POSITIONS[(currentIndex + step) % FRANCHISE_POSITIONS.length];
+
+      if (!occupiedPositions.has(candidate)) {
+        return setFranchisePlayerPosition(gmId, playerId, candidate);
+      }
+    }
+
+    return false;
   }, [gms, setFranchisePlayerPosition]);
 
   const assignPlayerCategory = useCallback((gmId, playerId, category) => {

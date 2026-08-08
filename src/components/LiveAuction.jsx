@@ -71,6 +71,23 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     return FRANCHISE_POSITIONS.map((position) => byPosition[position]).filter(Boolean);
   }, [FRANCHISE_POSITIONS, franchisePlacement, getFranchisePositionProfile]);
 
+  const occupiedFranchisePositions = useMemo(() => {
+    if (!franchisePlacement) {
+      return new Set();
+    }
+
+    const targetGM = gms.find((gm) => gm.id === franchisePlacement.gmId);
+    if (!targetGM) {
+      return new Set();
+    }
+
+    return new Set(
+      targetGM.roster
+        .filter((player) => player.id !== franchisePlacement.player.id && player.assignedPosition)
+        .map((player) => player.assignedPosition),
+    );
+  }, [franchisePlacement, gms]);
+
   const showPlayerStats = !hideScoutingStats;
 
   const openSlotGms = useMemo(
@@ -435,18 +452,20 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 const bestPosition = getFranchisePositionProfile(activeFranchisePlacement.player).bestPosition;
                 const isBest = showFranchisePositionHints && option.position === bestPosition;
                 const showFit = showFranchisePositionHints;
+                const isTaken = occupiedFranchisePositions.has(option.position);
 
                 return (
                   <button
                     key={option.position}
-                    className={`franchise-position-btn ${isSelected ? 'is-selected' : ''} ${isBest ? 'is-best-fit' : ''}`}
-                    onClick={() => setFranchisePosition(option.position)}
+                    className={`franchise-position-btn ${isSelected ? 'is-selected' : ''} ${isBest ? 'is-best-fit' : ''} ${isTaken ? 'is-taken' : ''}`}
+                    onClick={() => !isTaken && setFranchisePosition(option.position)}
+                    disabled={isTaken}
                   >
                     <strong>{option.position}</strong>
                     {showFit ? (
-                      <span>{option.label} · {option.score}</span>
+                      <span>{isTaken ? 'Occupied' : `${option.label} · ${option.score}`}</span>
                     ) : (
-                      <span>Unknown fit</span>
+                      <span>{isTaken ? 'Occupied' : 'Unknown fit'}</span>
                     )}
                   </button>
                 );
