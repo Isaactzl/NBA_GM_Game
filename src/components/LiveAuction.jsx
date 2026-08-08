@@ -5,7 +5,7 @@ import { playArcadeSound } from '../utils/soundEngine.js';
 
 const AUCTION_SECONDS = 15;
 const PLAYER_WHEEL_SPIN_MS = 2500;
-const PLAYER_WHEEL_LAND_HOLD_MS = 1000;
+const PLAYER_WHEEL_LAND_HOLD_MS = 1300;
 
 const TIER_GLOW = {
   S: 'rgba(251, 191, 36, 0.16)',
@@ -45,6 +45,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
   const [isPaused, setIsPaused] = useState(false);
   const [franchiseReveal, setFranchiseReveal] = useState(null);
   const [isPlayerWheelSpinning, setIsPlayerWheelSpinning] = useState(false);
+  const [isPlayerWheelLanded, setIsPlayerWheelLanded] = useState(false);
   const [wheelDisplayName, setWheelDisplayName] = useState('');
   const [isGmWheelSpinning, setIsGmWheelSpinning] = useState(false);
   const [gmWheelState, setGmWheelState] = useState({ active: false, candidateIds: [], winnerId: null, player: null });
@@ -193,6 +194,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     }
 
     setIsPlayerWheelSpinning(true);
+    setIsPlayerWheelLanded(false);
     setWheelDisplayName(activePlayer.name);
     playArcadeSound('wheelStart', { enabled: soundEnabled, volume: soundVolume });
 
@@ -210,11 +212,16 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     const stopTimer = window.setTimeout(() => {
       window.clearInterval(spinInterval);
       setWheelDisplayName(activePlayer.name);
+      setIsPlayerWheelLanded(true);
       playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
+      window.setTimeout(() => {
+        playArcadeSound('revealHit', { enabled: soundEnabled, volume: soundVolume });
+      }, 70);
     }, PLAYER_WHEEL_SPIN_MS);
 
     const resumeTimer = window.setTimeout(() => {
       setIsPlayerWheelSpinning(false);
+      setIsPlayerWheelLanded(false);
     }, PLAYER_WHEEL_SPIN_MS + PLAYER_WHEEL_LAND_HOLD_MS);
 
     return () => {
@@ -561,10 +568,10 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
               <div className="active-player-wrapper">
                 {isPlayerWheelSpinning && (
                   <div className="player-wheel-overlay">
-                    <div className="player-wheel-card">
+                    <div className={`player-wheel-card ${isPlayerWheelLanded ? 'is-landed' : ''}`}>
                       <p className="eyebrow">Arcade Player Wheel</p>
                       <strong>{wheelDisplayName || 'Selecting...'}</strong>
-                      <span>Landing on next auction target...</span>
+                      <span>{isPlayerWheelLanded ? 'Locked in!' : 'Landing on next auction target...'}</span>
                     </div>
                   </div>
                 )}

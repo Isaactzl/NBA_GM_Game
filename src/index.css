@@ -759,6 +759,16 @@ button {
   font-size: 0.82rem;
 }
 
+.player-wheel-card.is-landed {
+  animation: wheelLandHit 280ms ease-out;
+  border-color: rgba(251, 191, 36, 0.9);
+  box-shadow: 0 0 42px rgba(251, 191, 36, 0.45);
+}
+
+.player-wheel-card.is-landed strong {
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.7);
+}
+
 .gm-wheel-overlay {
   background: rgba(15, 23, 42, 0.82);
 }
@@ -780,6 +790,21 @@ button {
   to {
     transform: scale(1.01);
     box-shadow: 0 0 30px rgba(251, 191, 36, 0.28);
+  }
+}
+
+@keyframes wheelLandHit {
+  0% {
+    transform: scale(0.96);
+    filter: brightness(1);
+  }
+  55% {
+    transform: scale(1.04);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
   }
 }
 

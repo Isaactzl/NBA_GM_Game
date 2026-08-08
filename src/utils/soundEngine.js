@@ -80,6 +80,11 @@ export const playArcadeSound = (type, { enabled = true, volume = 0.65 } = {}) =>
       playTone(context, 260, now, 0.08, base * 0.9, 'sawtooth');
       playTone(context, 180, now + 0.06, 0.1, base * 0.72, 'triangle');
       break;
+    case 'revealHit':
+      playTone(context, 980, now, 0.05, base * 0.95, 'square');
+      playTone(context, 1280, now + 0.03, 0.08, base * 0.8, 'triangle');
+      playTone(context, 420, now + 0.08, 0.12, base * 0.6, 'sawtooth');
+      break;
     default:
       playTone(context, 600, now, 0.05, base * 0.5, 'square');
       break;
