@@ -4,6 +4,8 @@ import { PlayerCard } from './PlayerCard.jsx';
 import { playArcadeSound } from '../utils/soundEngine.js';
 
 const AUCTION_SECONDS = 15;
+const PLAYER_WHEEL_SPIN_MS = 2500;
+const PLAYER_WHEEL_LAND_HOLD_MS = 300;
 
 const TIER_GLOW = {
   S: 'rgba(251, 191, 36, 0.16)',
@@ -208,12 +210,16 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     const stopTimer = window.setTimeout(() => {
       window.clearInterval(spinInterval);
       setWheelDisplayName(activePlayer.name);
-      setIsPlayerWheelSpinning(false);
       playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
-    }, 2100);
+    }, PLAYER_WHEEL_SPIN_MS);
+
+    const resumeTimer = window.setTimeout(() => {
+      setIsPlayerWheelSpinning(false);
+    }, PLAYER_WHEEL_SPIN_MS + PLAYER_WHEEL_LAND_HOLD_MS);
 
     return () => {
       window.clearTimeout(stopTimer);
+      window.clearTimeout(resumeTimer);
       window.clearInterval(spinInterval);
     };
   }, [activePlayer, availablePlayers, draftComplete, pendingPlacement, franchisePlacement, franchiseReveal, isGmWheelSpinning, soundEnabled, soundVolume]);
