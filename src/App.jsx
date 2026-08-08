@@ -62,6 +62,12 @@ export default function App() {
     BUDGET_STEP,
     rosterEra,
     setRosterEra,
+    hideScoutingStats,
+    setHideScoutingStats,
+    soundEnabled,
+    setSoundEnabled,
+    soundVolume,
+    setSoundVolume,
     showFranchisePositionHints,
     setShowFranchisePositionHints,
     allowFranchisePositionShifts,
@@ -195,6 +201,51 @@ export default function App() {
                       </div>
                     </div>
                   </label>
+                </div>
+
+                <div className="setup-franchise-card">
+                  <div className="setup-panel-head setup-franchise-head">
+                    <h3>Draft Secrecy & Audio</h3>
+                    <span>Global</span>
+                  </div>
+
+                  <div className="setup-toggle-stack">
+                    <button
+                      type="button"
+                      className={`setup-toggle-chip ${hideScoutingStats ? 'is-active' : ''}`}
+                      onClick={() => setHideScoutingStats((current) => !current)}
+                    >
+                      {hideScoutingStats ? 'Hidden Scouting ON' : 'Hidden Scouting OFF'}
+                    </button>
+                    <p className="setup-toggle-copy">
+                      Hides player stats and tier during auctions. You can still toggle this in draft.
+                    </p>
+
+                    <button
+                      type="button"
+                      className={`setup-toggle-chip ${soundEnabled ? 'is-active' : ''}`}
+                      onClick={() => setSoundEnabled((current) => !current)}
+                    >
+                      {soundEnabled ? 'Sound ON' : 'Sound OFF'}
+                    </button>
+                    <p className="setup-toggle-copy">
+                      Arcade sounds for bids, timer pressure, wheel spins, and lock-ins.
+                    </p>
+
+                    <label className="setup-volume-stack" htmlFor="setup-volume">
+                      <span>Volume: {Math.round(soundVolume * 100)}%</span>
+                      <input
+                        id="setup-volume"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={Math.round(soundVolume * 100)}
+                        onChange={(event) => setSoundVolume(Number(event.target.value) / 100)}
+                        disabled={!soundEnabled}
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 {gameMode === 'the-franchise' && (
@@ -370,6 +421,27 @@ export default function App() {
             <span>{MAX_ROSTER_SIZE}-slot rosters</span>
             <span className="dot">•</span>
             <span>${STARTING_BUDGET} to spend</span>
+            <span className="dot">•</span>
+            <div className="meta-audio-controls">
+              <button
+                type="button"
+                className={`meta-sound-btn ${soundEnabled ? 'is-on' : ''}`}
+                onClick={() => setSoundEnabled((current) => !current)}
+              >
+                {soundEnabled ? 'Sound On' : 'Sound Off'}
+              </button>
+              <input
+                className="meta-sound-slider"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={Math.round(soundVolume * 100)}
+                onChange={(event) => setSoundVolume(Number(event.target.value) / 100)}
+                disabled={!soundEnabled}
+                aria-label="Draft sound volume"
+              />
+            </div>
           </div>
 
           <nav className="mobile-tab-bar" aria-label="Draft sections">

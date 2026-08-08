@@ -176,6 +176,9 @@ export function GameProvider({ children }) {
   const [gms, setGms] = useState(() => makeInitialGMState(4, DEFAULT_GM_NAMES.slice(0, 4), DEFAULT_STARTING_BUDGET));
   const [gameMode, setGameMode] = useState('frankenstein');
   const [rosterEra, setRosterEra] = useState('modern');
+  const [hideScoutingStats, setHideScoutingStats] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundVolume, setSoundVolume] = useState(0.65);
   const [showFranchisePositionHints, setShowFranchisePositionHints] = useState(true);
   const [allowFranchisePositionShifts, setAllowFranchisePositionShifts] = useState(false);
   const [draftRound, setDraftRound] = useState(1);
@@ -569,6 +572,12 @@ export function GameProvider({ children }) {
       BUDGET_STEP,
       rosterEra,
       setRosterEra,
+      hideScoutingStats,
+      setHideScoutingStats,
+      soundEnabled,
+      setSoundEnabled,
+      soundVolume,
+      setSoundVolume,
       showFranchisePositionHints,
       setShowFranchisePositionHints,
       allowFranchisePositionShifts,
@@ -601,7 +610,7 @@ export function GameProvider({ children }) {
       standings,
       draftComplete,
     }),
-    [players, gms, gmCount, gmNames, budgetAmount, rosterEra, showFranchisePositionHints, allowFranchisePositionShifts, activePlayerId, buyPlayer, passPlayer, wheelState, gameMode, draftRound, currentTurnGMId, getGMById, countUnfilledSlotsForMode, resetActivePlayer, resetDraft, getSynergySummary, getTeamScore, assignPlayerCategory, setFranchisePlayerPosition, cycleFranchisePlayerPosition, getPositionFitSummary, getFranchisePositionProfile, standings, draftComplete],
+    [players, gms, gmCount, gmNames, budgetAmount, rosterEra, hideScoutingStats, soundEnabled, soundVolume, showFranchisePositionHints, allowFranchisePositionShifts, activePlayerId, buyPlayer, passPlayer, wheelState, gameMode, draftRound, currentTurnGMId, getGMById, countUnfilledSlotsForMode, resetActivePlayer, resetDraft, getSynergySummary, getTeamScore, assignPlayerCategory, setFranchisePlayerPosition, cycleFranchisePlayerPosition, getPositionFitSummary, getFranchisePositionProfile, standings, draftComplete],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

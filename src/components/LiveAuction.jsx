@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGameContext } from '../context/GameContext.jsx';
 import { PlayerCard } from './PlayerCard.jsx';
+import { playArcadeSound } from '../utils/soundEngine.js';
 
 const AUCTION_SECONDS = 15;
 
@@ -26,6 +27,10 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     FRANCHISE_POSITIONS,
     showFranchisePositionHints,
     getFranchisePositionProfile,
+    hideScoutingStats,
+    setHideScoutingStats,
+    soundEnabled,
+    soundVolume,
   } = useGameContext();
   const [currentBid, setCurrentBid] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(AUCTION_SECONDS);
@@ -35,11 +40,13 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
   const [franchisePlacement, setFranchisePlacement] = useState(null);
   const [franchisePosition, setFranchisePosition] = useState(null);
   const [draggedPlayerName, setDraggedPlayerName] = useState(null);
-  const [showPlayerStats, setShowPlayerStats] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [franchiseReveal, setFranchiseReveal] = useState(null);
+  const [isPlayerWheelSpinning, setIsPlayerWheelSpinning] = useState(false);
+  const [wheelDisplayName, setWheelDisplayName] = useState('');
   const currentBidRef = useRef(0);
   const highestBidderRef = useRef(null);
+  const previousSecondsRef = useRef(AUCTION_SECONDS);
 
   const clearAuctionState = useCallback(() => {
     setCurrentBid(0);
@@ -53,8 +60,13 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
       return [];
     }
 
-    return getFranchisePositionProfile(franchisePlacement.player).positions;
-  }, [franchisePlacement, getFranchisePositionProfile]);
+    const profile = getFranchisePositionProfile(franchisePlacement.player);
+    const byPosition = Object.fromEntries(profile.positions.map((entry) => [entry.position, entry]));
+
+    return FRANCHISE_POSITIONS.map((position) => byPosition[position]).filter(Boolean);
+  }, [FRANCHISE_POSITIONS, franchisePlacement, getFranchisePositionProfile]);
+
+  const showPlayerStats = !hideScoutingStats;
 
   const openSlotGms = useMemo(
     () => gms.filter((gm) => gm.roster.length < MAX_ROSTER_SIZE),
@@ -113,10 +125,12 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
 
         if (winner && gameMode === 'frankenstein') {
           setPendingPlacement({ gmId: forcedTarget.id, player: winner });
+          playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
         } else if (winner && gameMode === 'the-franchise') {
           setFranchisePlacement({ gmId: forcedTarget.id, player: winner });
           setFranchisePosition(null);
           setIsPaused(true);
+          playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
         }
 
         return Boolean(winner);
@@ -151,10 +165,44 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
   useEffect(() => {
     clearAuctionState();
     setSecondsLeft(AUCTION_SECONDS);
+    previousSecondsRef.current = AUCTION_SECONDS;
   }, [activePlayer?.id, clearAuctionState]);
 
   useEffect(() => {
-    if (!activePlayer || pendingPlacement || isPaused || draftComplete) {
+    if (!activePlayer || draftComplete || pendingPlacement || franchisePlacement || franchiseReveal) {
+      return undefined;
+    }
+
+    setIsPlayerWheelSpinning(true);
+    setWheelDisplayName(activePlayer.name);
+    playArcadeSound('wheelStart', { enabled: soundEnabled, volume: soundVolume });
+
+    let tickCount = 0;
+    const spinInterval = window.setInterval(() => {
+      const pool = availablePlayers.length > 0 ? availablePlayers : [activePlayer];
+      const next = pool[Math.floor(Math.random() * pool.length)];
+      setWheelDisplayName(next?.name ?? activePlayer.name);
+      tickCount += 1;
+      if (tickCount % 2 === 0) {
+        playArcadeSound('wheelTick', { enabled: soundEnabled, volume: soundVolume * 0.8 });
+      }
+    }, 75);
+
+    const stopTimer = window.setTimeout(() => {
+      window.clearInterval(spinInterval);
+      setWheelDisplayName(activePlayer.name);
+      setIsPlayerWheelSpinning(false);
+      playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
+    }, 1450);
+
+    return () => {
+      window.clearTimeout(stopTimer);
+      window.clearInterval(spinInterval);
+    };
+  }, [activePlayer, availablePlayers, draftComplete, pendingPlacement, franchisePlacement, franchiseReveal, soundEnabled, soundVolume]);
+
+  useEffect(() => {
+    if (!activePlayer || pendingPlacement || isPaused || draftComplete || isPlayerWheelSpinning || franchisePlacement || franchiseReveal) {
       return undefined;
     }
 
@@ -163,10 +211,26 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [activePlayer, pendingPlacement, isPaused, draftComplete]);
+  }, [activePlayer, pendingPlacement, isPaused, draftComplete, isPlayerWheelSpinning, franchisePlacement, franchiseReveal]);
 
   useEffect(() => {
-    if (secondsLeft > 0 || !activePlayer || pendingPlacement || isPaused || draftComplete) {
+    if (isPaused || draftComplete || isPlayerWheelSpinning || pendingPlacement || franchisePlacement || franchiseReveal) {
+      previousSecondsRef.current = secondsLeft;
+      return;
+    }
+
+    if (secondsLeft < previousSecondsRef.current && secondsLeft > 0 && secondsLeft <= 5) {
+      playArcadeSound(secondsLeft === 1 ? 'finalTick' : 'tick', {
+        enabled: soundEnabled,
+        volume: soundVolume,
+      });
+    }
+
+    previousSecondsRef.current = secondsLeft;
+  }, [secondsLeft, isPaused, draftComplete, isPlayerWheelSpinning, pendingPlacement, franchisePlacement, franchiseReveal, soundEnabled, soundVolume]);
+
+  useEffect(() => {
+    if (secondsLeft > 0 || !activePlayer || pendingPlacement || isPaused || draftComplete || isPlayerWheelSpinning || franchisePlacement || franchiseReveal) {
       return;
     }
 
@@ -178,12 +242,14 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
           gmId: highestBidderRef.current,
           player: winner,
         });
+        playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
 
         return;
       } else if (winner && gameMode === 'the-franchise') {
         setFranchisePlacement({ gmId: highestBidderRef.current, player: winner });
         setFranchisePosition(null);
         setIsPaused(true);
+        playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
         return;
       }
 
@@ -200,10 +266,15 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     pendingPlacement,
     isPaused,
     draftComplete,
+    isPlayerWheelSpinning,
+    franchisePlacement,
+    franchiseReveal,
     buyPlayer,
     gameMode,
     clearAuctionState,
     resolveNoBidOutcome,
+    soundEnabled,
+    soundVolume,
   ]);
 
   const handleRaiseBid = (gmId) => {
@@ -220,6 +291,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     currentBidRef.current = nextBid;
     setHighestBidderId(gmId);
     highestBidderRef.current = gmId;
+    playArcadeSound('bid', { enabled: soundEnabled, volume: soundVolume });
   };
 
   const togglePause = () => {
@@ -253,6 +325,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
       setDraggedPlayerName(null);
       setSecondsLeft(AUCTION_SECONDS);
       setIsPaused(true); // Hold for next player — resume when ready
+      playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
     }
   };
 
@@ -264,14 +337,17 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
     const placed = setFranchisePlayerPosition(franchisePlacement.gmId, franchisePlacement.player.id, franchisePosition);
 
     if (placed) {
+      const selectedFit = franchisePositionOptions.find((option) => option.position === franchisePosition) ?? null;
+
       setFranchiseReveal({
         gmId: franchisePlacement.gmId,
         player: { ...franchisePlacement.player, assignedPosition: franchisePosition },
         position: franchisePosition,
-        fit: franchisePositionOptions.find((option) => option.position === franchisePosition) ?? null,
+        fit: selectedFit,
       });
       setFranchisePlacement(null);
       setFranchisePosition(null);
+      playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
     }
   };
 
@@ -309,7 +385,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
               <div className="category-lock-badge">Category Placement</div>
               <h3 className="category-block-name">{pendingPlacement.player.name}</h3>
               <p className="category-block-sub">
-                {pendingPlacement.player.position} &middot; Tier {pendingPlacement.player.tier}
+                {showPlayerStats ? `${pendingPlacement.player.position} · Tier ${pendingPlacement.player.tier}` : pendingPlacement.player.position}
               </p>
               <p className="category-block-hint">Select a slot below, then confirm to lock this player in.</p>
             </div>
@@ -320,7 +396,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
               <div className="category-lock-badge">Choose Position</div>
               <h3 className="category-block-name">{activeFranchisePlacement.player.name}</h3>
               <p className="category-block-sub">
-                {activeFranchisePlacement.player.position} &middot; Tier {activeFranchisePlacement.player.tier}
+                {showPlayerStats ? `${activeFranchisePlacement.player.position} · Tier ${activeFranchisePlacement.player.tier}` : activeFranchisePlacement.player.position}
               </p>
               <p className="category-block-hint">
                 Pick the slot before you lock this player into the roster.
@@ -330,7 +406,8 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
             <div className="franchise-position-grid">
               {franchisePositionOptions.map((option) => {
                 const isSelected = franchisePosition === option.position;
-                const isBest = option.position === franchisePositionOptions[0]?.position;
+                const bestPosition = getFranchisePositionProfile(activeFranchisePlacement.player).bestPosition;
+                const isBest = showFranchisePositionHints && option.position === bestPosition;
                 const showFit = showFranchisePositionHints;
 
                 return (
@@ -343,7 +420,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                     {showFit ? (
                       <span>{option.label} · {option.score}</span>
                     ) : (
-                      <span>Hidden fit</span>
+                      <span>Unknown fit</span>
                     )}
                   </button>
                 );
@@ -371,7 +448,9 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                   <div>
                     <p className="label">{isPaused ? '⏸ Paused' : 'Active player'}</p>
                     <p className="auction-hint compact-hint">
-                      {isPaused
+                      {isPlayerWheelSpinning
+                        ? 'Arcade wheel selecting the next spotlight player...'
+                        : isPaused
                         ? 'Paused — press Resume when everyone is ready to bid.'
                         : 'Scout the player, then hit the market.'}
                     </p>
@@ -383,21 +462,30 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                   <button className="icon-btn auction-control-btn" onClick={togglePause}>
                     {isPaused ? 'Resume' : 'Pause'}
                   </button>
-                  <button className="icon-btn auction-control-btn stats-toggle" onClick={() => setShowPlayerStats((current) => !current)}>
+                  <button className="icon-btn auction-control-btn stats-toggle" onClick={() => setHideScoutingStats((current) => !current)}>
                     {showPlayerStats ? 'Hide stats' : 'Show stats'}
                   </button>
                 </div>
               </div>
 
               <div className="active-player-wrapper">
+                {isPlayerWheelSpinning && (
+                  <div className="player-wheel-overlay">
+                    <div className="player-wheel-card">
+                      <p className="eyebrow">Arcade Player Wheel</p>
+                      <strong>{wheelDisplayName || 'Selecting...'}</strong>
+                      <span>Landing on next auction target...</span>
+                    </div>
+                  </div>
+                )}
                 {gameMode === 'the-franchise' && franchiseReveal && (
                   <div className="franchise-reveal-overlay">
                     <div className="franchise-reveal-card">
                       <p className="eyebrow">Drafted Player</p>
                       <h3>{franchiseReveal.player.name}</h3>
-                      <p>{franchiseReveal.position} • Tier {franchiseReveal.player.tier}</p>
+                      <p>{showPlayerStats ? `${franchiseReveal.position} • Tier ${franchiseReveal.player.tier}` : franchiseReveal.position}</p>
                       <p className="franchise-reveal-position-fit">
-                        {showFranchisePositionHints ? `${franchiseReveal.fit.label} (${franchiseReveal.fit.score})` : 'Fit revealed later'}
+                        {showFranchisePositionHints && franchiseReveal.fit ? `${franchiseReveal.fit.label} (${franchiseReveal.fit.score})` : 'Fit revealed later'}
                       </p>
                       <div className="franchise-reveal-badge">Locked to {gms.find((gm) => gm.id === franchiseReveal.gmId)?.name ?? 'Unknown GM'}</div>
                       <button className="primary-btn" onClick={closeFranchiseReveal}>
@@ -421,6 +509,8 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 <span>
                   {draftComplete
                     ? 'Draft complete'
+                    : isPlayerWheelSpinning
+                      ? 'Player wheel spinning'
                     : franchiseReveal
                       ? 'Position locked'
                       : franchisePlacement
@@ -431,7 +521,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 </span>
               </div>
 
-              {!isPaused && !currentBid && !highestBidderId && !franchisePlacement && (
+              {!isPaused && !isPlayerWheelSpinning && !currentBid && !highestBidderId && !franchisePlacement && (
                 <div className="auction-warning-pill">⚠ No bids yet. Timeout may hand this player away automatically.</div>
               )}
 
@@ -439,7 +529,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 {gms.map((gm) => {
                   const isRosterFull = gm.roster.length >= MAX_ROSTER_SIZE;
                   const isNoMoney = gm.budget <= currentBid;
-                  const isDisabled = draftComplete || pendingPlacement || franchiseReveal || franchisePlacement || isNoMoney || isRosterFull;
+                  const isDisabled = draftComplete || pendingPlacement || franchiseReveal || franchisePlacement || isPlayerWheelSpinning || isNoMoney || isRosterFull;
                   const isLeading = gm.id === highestBidderId;
                   const statusLabel = isLeading
                     ? 'Leading'
@@ -471,7 +561,7 @@ export function LiveAuction({ selectedGM, draftComplete = false }) {
                 })}
               </div>
 
-              <button className="auction-pass-btn" onClick={skipAuction} disabled={draftComplete || franchiseReveal || franchisePlacement}>
+              <button className="auction-pass-btn" onClick={skipAuction} disabled={draftComplete || franchiseReveal || franchisePlacement || isPlayerWheelSpinning}>
                 Pass (Skip Player)
               </button>
             </div>

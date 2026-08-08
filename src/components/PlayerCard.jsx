@@ -24,7 +24,7 @@ export function PlayerCard({ player, showStats = true, className = '', style = {
         <div className="player-scout-copy">
           <h3>{player.name}</h3>
           <p>
-            {player.position} • Tier {player.tier}
+            {showStats ? `${player.position} • Tier ${player.tier}` : player.position}
           </p>
 
           {player.assignedCategory && (

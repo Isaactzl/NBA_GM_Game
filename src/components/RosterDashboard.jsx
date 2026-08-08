@@ -61,7 +61,7 @@ export function RosterDashboard({ selectedGM, gms, gameMode }) {
                     key: `${gm.id}-slot-${index + 1}`,
                     label: `Slot ${index + 1}`,
                     player,
-                    grade: player?.tier ?? null,
+                    grade: null,
                   };
                 });
 
@@ -93,8 +93,8 @@ export function RosterDashboard({ selectedGM, gms, gameMode }) {
                       <strong className="horizon-slot-name">{slot.player.name}</strong>
                       <span className="horizon-slot-subline">
                         {gameMode === 'the-franchise'
-                          ? `${slot.player.assignedPosition ?? slot.player.position} • Tier ${slot.player.tier}`
-                          : `${slot.player.position} • Tier ${slot.player.tier}`}
+                          ? `${slot.player.assignedPosition ?? slot.player.position}`
+                          : `${slot.player.position}`}
                       </span>
                       {gameMode === 'the-franchise' && (
                         <div className="franchise-slot-actions">

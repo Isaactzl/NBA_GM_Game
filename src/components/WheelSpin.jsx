@@ -1,7 +1,25 @@
+import { useEffect } from 'react';
 import { useGameContext } from '../context/GameContext.jsx';
+import { playArcadeSound } from '../utils/soundEngine.js';
 
 export function WheelSpin() {
-  const { wheelState, gms } = useGameContext();
+  const { wheelState, gms, soundEnabled, soundVolume } = useGameContext();
+
+  useEffect(() => {
+    if (!wheelState.visible) {
+      return;
+    }
+
+    if (wheelState.spinning) {
+      playArcadeSound('wheelStart', { enabled: soundEnabled, volume: soundVolume });
+      return;
+    }
+
+    if (wheelState.winnerId) {
+      playArcadeSound('wheelStop', { enabled: soundEnabled, volume: soundVolume });
+      playArcadeSound('auctionWin', { enabled: soundEnabled, volume: soundVolume });
+    }
+  }, [wheelState.visible, wheelState.spinning, wheelState.winnerId, soundEnabled, soundVolume]);
 
   return (
     <div className="wheel-overlay">
